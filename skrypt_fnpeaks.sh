@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT_FILE="results.txt"
+OUTPUT_FILE="results_fnpeaks.txt"
 
 > "$OUTPUT_FILE"
 
