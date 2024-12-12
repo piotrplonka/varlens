@@ -138,7 +138,7 @@ int main (int argc, char *argv[])
     
     freq_min = 0.01;
     freq_max = 100;
-    delta_freq = 0.002*freq_min;
+    delta_freq = 0.01*freq_min;
     n_freq = (int)((freq_max-freq_min)/delta_freq);
     
     mean_flux = 0.0;
