@@ -137,7 +137,7 @@ int main (int argc, char *argv[])
     npts = remove_lowest_datapoint(time, flux, ferr, npts);
     
     freq_min = 0.01;
-    freq_max = 250.0;
+    freq_max = 100;
     delta_freq = 0.002*freq_min;
     n_freq = (int)((freq_max-freq_min)/delta_freq);
     
