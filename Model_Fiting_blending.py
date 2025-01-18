@@ -14,9 +14,12 @@ time, magnitudo, error = data[:, 0], data[:, 1], data[:, 2]
 flux = 10**(-0.4 * (magnitudo-22))
 flux_error = 0.4*np.log(10)*error #10**(-0.4 * (error))*f# 0.4*np.log(10)*error
 
+#Sigma
+sigma=np.sqrt(np.var(flux))
+
 # Poszukiwanie maksimum jasności jako mediany 10 najjaśniejszych punktów
 sorted_indices = np.argsort(magnitudo)
-lowest_magnitudes_indices = sorted_indices[:30]
+lowest_magnitudes_indices = sorted_indices[:10]
 lowest_magnitudes_time = time[lowest_magnitudes_indices]
 median_time = np.median(lowest_magnitudes_time)
 
@@ -79,27 +82,22 @@ def find_best_model_parallel(initial_guesses, time, flux, flux_error, num_proces
 
     return best_result, best_chi2
 
-# Tablice wartości początkowych
-time_window = 100  # Liczba dni w obie strony od median_time
-time_step = 3
-t_0_values = np.arange(median_time-20, median_time + 20, time_step)
 
-guess_u_0 =               np.linspace(0.01, 1, 5)
-guess_t_E =               np.linspace(1, 200, 5)
-baseline_guess_flux =     np.median(flux)
-alpha = np.linspace(0,1,5)
-baseline_blending_guess = alpha*np.median(flux)
-baseline_source_guess =   alpha*np.median(flux)
+guess_u_0 = np.linspace(0.01, 1, 10)
+guess_t_E = np.linspace(1, 200, 10)
 
-# Dodanie baseline do wartości początkowych
+# Stałe wartości dla pozostałych parametrów
+fixed_t_0 = median_time  
+fixed_source = np.median(flux) * 0.5  
+fixed_blend = np.median(flux) * 0.5  
+
+# Iteracja tylko po u_0 i t_E
 initial_guesses = [
-    (t_0, u, t, source, blend) 
-    for t_0 in t_0_values 
+    (fixed_t_0, u, t, fixed_source, fixed_blend) 
     for u in guess_u_0 
-    for t in guess_t_E 
-    for source in baseline_source_guess 
-    for blend in baseline_blending_guess
+    for t in guess_t_E
 ]
+
 
 # Poszukiwanie najlepszego modelu
 best_params, best_chi2 = find_best_model_parallel(initial_guesses, time, flux, flux_error)
@@ -141,35 +139,98 @@ A_model = ((u_model**2 + 2) / (u_model * np.sqrt(u_model**2 + 4)))
 flux_model = fit_source * A_model+fit_blending
 
 # Wizualizacja danych
-plt.scatter(time, magnitudo, label='Dane obserwacyjne', color='blue', s=10)
-plt.plot(time_model, -2.5 * np.log10(flux_model)+22, label='Model dopasowany', color='red', linewidth=2)
-plt.gca().invert_yaxis()  # Odwrócenie osi y, bo jasność rośnie w dół
-plt.xlabel('Czas')
-plt.ylabel('Jasność')
-plt.title('Dopasowanie modelu do danych fotometrycznych')
-plt.legend()
-plt.grid(True)
-plt.show()
+#plt.scatter(time, magnitudo, label='Dane obserwacyjne', color='blue', s=10)
+#plt.plot(time_model, -2.5 * np.log10(flux_model)+22, label='Model dopasowany', color='red', linewidth=2)
+#plt.gca().invert_yaxis()  # Odwrócenie osi y, bo jasność rośnie w dół
+#plt.xlabel('Czas')
+#plt.ylabel('Jasność')
+#plt.title('Dopasowanie modelu do danych fotometrycznych')
+#plt.legend()
+#plt.grid(True)
+#plt.show()
 
-
-#
+#Usuwanie wzmocnienia
 u_model = np.sqrt(fit_u_0**2 + ((time - fit_t_0) / fit_t_E)**2)
 A_model = ((u_model**2 + 2) / (u_model * np.sqrt(u_model**2 + 4)))
 flux_model_deleted =  (flux - fit_blending)/A_model 
 new_magnuitudo = -2.5 * np.log10(flux_model_deleted)+22
 
+# Wizualizacja danych
+#plt.scatter(time, new_magnuitudo, label='Dane obserwacyjne', color='blue', s=10)
+#plt.plot(time_model, -2.5 * np.log10(flux_model)+22, label='Model dopasowany', color='red', linewidth=2)
+#plt.gca().invert_yaxis()  # Odwrócenie osi y, bo jasność rośnie w dół
+#plt.xlabel('Czas')
+#plt.ylabel('Jasność')
+#plt.title('Dopasowanie modelu do danych fotometrycznych')
+#plt.legend()
+#plt.grid(True)
+#plt.show()
 
+# Pobranie bieżącej ścieżki folderu
+current_path = os.getcwd()
 
+# Nazwa bieżącego folderu
+current_folder_name = os.path.basename(current_path)
 
+# Pobranie ścieżki folderu nadrzędnego
+parent_path = os.path.dirname(current_path)
 
+# Nazwa folderu nadrzędnego
+parent_folder_name = os.path.basename(parent_path)
+
+# Utworzenie nazw plików
+in_filename = f"{parent_folder_name}_{current_folder_name}_in.dat"
+out_filename = f"{parent_folder_name}_{current_folder_name}_out.dat"
+
+# Wyświetlenie wyników
+print("Nazwa pliku wejściowego:", in_filename)
+print("Nazwa pliku wyjściowego:", out_filename)
+
+#Zakłądam, że bierzemy miejsce gdzie 10% wynosi wzmocnienie
+A_0_new =1+ sigma/fit_source
+t1, t2 = equation_for_time(A_0_new, fit_t_E, fit_u_0, fit_t_0)
+mask_in_range = (time >= t1) & (time <= t2)
+
+# Maska dla danych wewnątrz zakresu
+time_in_range = time[mask_in_range]
+mag_deleted_in_range = new_magnuitudo[mask_in_range]
+error_in_range = error[mask_in_range]
+mag_in_range = magnitudo[mask_in_range]
+
+# Maska dla danych poza zakresem
+mask_out_of_range = ~mask_in_range
+time_out_of_range = time[mask_out_of_range]
+mag_deleted_out_of_range = new_magnuitudo[mask_out_of_range]
+error_out_of_range = error[mask_out_of_range]
+mag_out_of_range = magnitudo[mask_out_of_range]
+
+if len(time_in_range) > 0:
+    
+    # Zapisz do pliku z danymi "in"
+    np.savetxt(in_filename, np.column_stack((time_in_range, mag_in_range, error_in_range)), fmt='%.8f %.8f %.8f', comments='')
+
+    # Zapisz do pliku z danymi "out"
+    np.savetxt(out_filename, np.column_stack((time_out_of_range, mag_out_of_range, error_out_of_range)), fmt='%.8f %.8f %.8f', comments='')
+
+else:
+    print(f"Dane dla {in_filename} są puste, pomijam zapis.")
+#plt.scatter(time_in_range, mag_in_range, label='Dane obserwacyjne I', color='blue', s=10)
+#plt.scatter(time_out_of_range, mag_out_of_range, label='Dane obserwacyjne II', color='red', s=10)
+#plt.gca().invert_yaxis()
+#plt.xlabel('Czas')
+#plt.ylabel('Jasność')
+#plt.title('Dopasowanie modelu do danych fotometrycznych')
+#plt.legend()
+#plt.grid(True)
+#plt.show()
 
 # Wizualizacja danych
-plt.scatter(time, new_magnuitudo, label='Dane obserwacyjne', color='blue', s=10)
-plt.plot(time_model, -2.5 * np.log10(flux_model)+22, label='Model dopasowany', color='red', linewidth=2)
-plt.gca().invert_yaxis()  # Odwrócenie osi y, bo jasność rośnie w dół
-plt.xlabel('Czas')
-plt.ylabel('Jasność')
-plt.title('Dopasowanie modelu do danych fotometrycznych')
-plt.legend()
-plt.grid(True)
-plt.show()
+#plt.scatter(time_in_range, mag_deleted_in_range, label='Dane obserwacyjne I', color='blue', s=10)
+#plt.scatter(time_out_of_range, mag_deleted_out_of_range, label='Dane obserwacyjne II', color='red', s=10)
+#plt.gca().invert_yaxis()
+#plt.xlabel('Czas')
+#plt.ylabel('Jasność')
+#plt.title('Dopasowanie modelu do danych fotometrycznych')
+#plt.legend()
+#plt.grid(True)
+#plt.show()
