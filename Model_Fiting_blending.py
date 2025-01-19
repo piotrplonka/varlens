@@ -207,10 +207,10 @@ mag_out_of_range = magnitudo[mask_out_of_range]
 if len(time_in_range) > 0:
     
     # Zapisz do pliku z danymi "in"
-    np.savetxt(in_filename, np.column_stack((time_in_range, mag_in_range, error_in_range)), fmt='%.8f %.8f %.8f', comments='')
+    np.savetxt(in_filename, np.column_stack((time_in_range, mag_deleted_in_range, error_in_range)), fmt='%.8f %.8f %.8f', comments='')
 
     # Zapisz do pliku z danymi "out"
-    np.savetxt(out_filename, np.column_stack((time_out_of_range, mag_out_of_range, error_out_of_range)), fmt='%.8f %.8f %.8f', comments='')
+    np.savetxt(out_filename, np.column_stack((time_out_of_range, mag_deleted_out_of_range, error_out_of_range)), fmt='%.8f %.8f %.8f', comments='')
 
 else:
     print(f"Dane dla {in_filename} są puste, pomijam zapis.")
