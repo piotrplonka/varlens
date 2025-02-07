@@ -22,7 +22,7 @@ lowest_magnitudes_indices = sorted_indices[:10]
 lowest_magnitudes_time = time[lowest_magnitudes_indices]
 median_time = np.median(lowest_magnitudes_time)
 
-#Baseline początkowa wartość
+#Poczatkowa wartosc baseline
 sorted_indices_flux = np.argsort(flux)
 lowest_flux = sorted_indices[:50]
 
