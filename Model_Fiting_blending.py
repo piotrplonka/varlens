@@ -184,7 +184,6 @@ out_filename = f"{parent_folder_name}_{current_folder_name}_out.dat"
 print("Nazwa pliku wejściowego:", in_filename)
 print("Nazwa pliku wyjściowego:", out_filename)
 
-#Zakłądam, że bierzemy miejsce gdzie 10% wynosi wzmocnienie
 A_0_new =1+ sigma/fit_source
 t1, t2 = equation_for_time(A_0_new, fit_t_E, fit_u_0, fit_t_0)
 mask_in_range = (time >= t1) & (time <= t2)
