@@ -1,0 +1,11 @@
+Summary of the Report: Search for Periodic Variability in Gravitational Microlensing Events
+
+This study analyzes data from the OGLE Early Warning System (EWS) to determine whether microlensed objects exhibit periodic variability, 
+suggesting they might be variable stars. The research team divided the observational data into two categories: during microlensing events (IN) and outside of them (OUT). 
+The gravitational lensing effect was mathematically corrected using known models, removing amplification and isolating the intrinsic variability of the source.
+
+The study employed Fourier analysis (fnpeaks) and the Analysis of Variance (AOV) method to detect periodic signals in photometric data. 
+Additionally, the vartool program was used for periodogram analysis and classification of variable objects. 
+Out of approximately 10,000 observed microlensing events, 33 showed periodic variability. 
+The periods detected in the IN and OUT datasets were largely consistent, supporting the hypothesis that the sources exhibit genuine periodic changes. 
+Future work aims to expand the dataset and refine the classification of variable objects.
