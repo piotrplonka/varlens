@@ -17,3 +17,5 @@ Project supervisor was dr hab. Radosław Poleski
 The report of the entire project is in the file Raport_varlens.pdf.
 
 The final list of discovered variable objects is in the file Final_list.txt
+
+The main report is in Polish, but a brief description of the project in English is available in the file Eng_report.
