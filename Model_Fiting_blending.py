@@ -6,7 +6,6 @@ import scipy.optimize as op
 import math
 import multiprocessing
 
-# Wczytywanie danych z pliku z fotometrią
 filename_data = 'phot.dat'
 data = np.loadtxt(filename_data, usecols=(0, 1, 2))
 time, magnitudo, error = data[:, 0], data[:, 1], data[:, 2]
@@ -14,7 +13,7 @@ time, magnitudo, error = data[:, 0], data[:, 1], data[:, 2]
 flux = 10**(-0.4 * (magnitudo-22))
 flux_error = 0.4*np.log(10)*error #10**(-0.4 * (error))*f# 0.4*np.log(10)*error
 
-#Sigma
+
 sigma=np.sqrt(np.var(flux))
 
 # Poszukiwanie maksimum jasności jako mediany 10 najjaśniejszych punktów
@@ -178,7 +177,6 @@ parent_path = os.path.dirname(current_path)
 # Nazwa folderu nadrzędnego
 parent_folder_name = os.path.basename(parent_path)
 
-# Utworzenie nazw plików
 in_filename = f"{parent_folder_name}_{current_folder_name}_in.dat"
 out_filename = f"{parent_folder_name}_{current_folder_name}_out.dat"
 
@@ -206,10 +204,8 @@ mag_out_of_range = magnitudo[mask_out_of_range]
 
 if len(time_in_range) > 0:
     
-    # Zapisz do pliku z danymi "in"
     np.savetxt(in_filename, np.column_stack((time_in_range, mag_deleted_in_range, error_in_range)), fmt='%.8f %.8f %.8f', comments='')
-
-    # Zapisz do pliku z danymi "out"
+    
     np.savetxt(out_filename, np.column_stack((time_out_of_range, mag_deleted_out_of_range, error_out_of_range)), fmt='%.8f %.8f %.8f', comments='')
 
 else:
