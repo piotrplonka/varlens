@@ -8,6 +8,7 @@ Raport z całego projektu znajduje się w pliku Raport_varlens.pdf.
 
 Ostateczna lista odkrytych obiektów zmiennych znajduje się w pliku Final_list.txt
 
+*********************************************************************************
 Student Project 2025
 Title: Searching for periodic variability in gravitational microlensing data
 
